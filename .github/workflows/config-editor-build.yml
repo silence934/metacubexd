@@ -1,0 +1,54 @@
+name: Config editor build
+
+on:
+  push:
+    branches:
+      - feature/config-editor
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: config-editor-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Generate static UI
+        run: NUXT_APP_BASE_URL='./' pnpm generate
+
+      - name: Publish gh-pages
+        if: github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./.output/public
+          force_orphan: true
+
+      - name: Package static UI
+        run: tar czf metacubexd-config-editor.tgz -C .output/public .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metacubexd-config-editor
+          path: metacubexd-config-editor.tgz
+          if-no-files-found: error

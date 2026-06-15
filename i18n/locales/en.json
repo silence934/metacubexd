@@ -330,5 +330,17 @@
   "customThemeColorsDesc": "Override theme color tokens",
   "settingsBackup": "Settings Backup",
   "exportSettings": "Export",
-  "importSettings": "Import"
+  "importSettings": "Import",
+  "editableConfig": "Rules & Subscriptions",
+  "editableConfigDesc": "Persist rules and proxy provider URLs, then hot-reload Mihomo",
+  "proxyProviderUrls": "Proxy provider URLs",
+  "noEditableProxyProviders": "No editable HTTP proxy providers",
+  "addRule": "Add rule",
+  "deleteRule": "Delete rule",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "rulePlaceholder": "Example: DOMAIN-SUFFIX,example.com,PROXY",
+  "saveAndReload": "Save & reload",
+  "editableConfigEmptyRule": "Rules cannot be empty. Fill in or remove the blank rule.",
+  "editableConfigSaved": "Saved; backup: {backup}; version: {version}"
 }

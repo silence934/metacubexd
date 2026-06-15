@@ -330,5 +330,17 @@
   "customThemeColorsDesc": "覆盖主题配色变量",
   "settingsBackup": "设置备份",
   "exportSettings": "导出",
-  "importSettings": "导入"
+  "importSettings": "导入",
+  "editableConfig": "规则与订阅",
+  "editableConfigDesc": "持久化修改规则和代理提供者地址，保存后自动热更新",
+  "proxyProviderUrls": "代理提供者地址",
+  "noEditableProxyProviders": "没有可编辑的 HTTP 代理提供者",
+  "addRule": "添加规则",
+  "deleteRule": "删除规则",
+  "moveUp": "上移",
+  "moveDown": "下移",
+  "rulePlaceholder": "例如 DOMAIN-SUFFIX,example.com,PROXY",
+  "saveAndReload": "保存并热更新",
+  "editableConfigEmptyRule": "规则不能为空，请填写或删除空白规则",
+  "editableConfigSaved": "保存成功；备份：{backup}；版本：{version}"
 }

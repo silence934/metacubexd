@@ -287,5 +287,17 @@
   "customThemeColorsDesc": "Переопределить цвета темы",
   "settingsBackup": "Резервная копия настроек",
   "exportSettings": "Экспорт",
-  "importSettings": "Импорт"
+  "importSettings": "Импорт",
+  "editableConfig": "Правила и подписки",
+  "editableConfigDesc": "Сохраняет правила и URL провайдеров, затем перезагружает Mihomo",
+  "proxyProviderUrls": "URL провайдеров прокси",
+  "noEditableProxyProviders": "Нет редактируемых HTTP-провайдеров",
+  "addRule": "Добавить правило",
+  "deleteRule": "Удалить правило",
+  "moveUp": "Переместить вверх",
+  "moveDown": "Переместить вниз",
+  "rulePlaceholder": "Пример: DOMAIN-SUFFIX,example.com,PROXY",
+  "saveAndReload": "Сохранить и перезагрузить",
+  "editableConfigEmptyRule": "Правило не может быть пустым.",
+  "editableConfigSaved": "Сохранено; резервная копия: {backup}; версия: {version}"
 }

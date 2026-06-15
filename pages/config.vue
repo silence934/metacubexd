@@ -228,7 +228,7 @@ const isLoading = computed(
 const isError = computed(() => isErrorConfig.value || isErrorVersion.value)
 
 // Active section for mobile tabs
-const activeSection = ref<'core' | 'xd' | 'tools'>('core')
+const activeSection = ref<'core' | 'xd' | 'editable' | 'tools'>('core')
 </script>
 
 <template>
@@ -336,6 +336,14 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
           @click="activeSection = 'xd'"
         >
           {{ t('xdConfig') }}
+        </button>
+        <button
+          v-if="!isSingBox"
+          class="tab"
+          :class="{ 'tab-active': activeSection === 'editable' }"
+          @click="activeSection = 'editable'"
+        >
+          {{ t('editableConfig') }}
         </button>
         <button
           v-if="!isSingBox"
@@ -1143,6 +1151,12 @@ const activeSection = ref<'core' | 'xd' | 'tools'>('core')
             </div>
           </div>
         </div>
+
+        <EditableConfigEditor
+          v-if="!isSingBox"
+          class="col-span-1 hidden sm:block lg:col-span-2"
+          :class="{ '!block': activeSection === 'editable' }"
+        />
 
         <!-- Actions Card (Full Width) -->
         <div

@@ -31,6 +31,16 @@ interface MockProviderShape {
   proxies?: MockProxyShape[]
 }
 
+export interface EditableConfig {
+  'proxy-providers': Record<string, string>
+  rules: string[]
+}
+
+export interface EditableConfigUpdateResult {
+  backup: string
+  version: string
+}
+
 const MOCK_HISTORY_CAP = 10
 
 function pickJitteredDelay(previous: number | undefined): number {
@@ -111,6 +121,7 @@ function getMockData(url: string): unknown {
   // Map API endpoints to mock data
   if (path === 'version') return mockData.mockVersion
   if (path === 'configs') return mockData.mockConfig
+  if (path === 'configs/editable') return { 'proxy-providers': {}, rules: [] }
   if (path === 'proxies') return { proxies: mockData.mockProxies }
   if (path === 'providers/proxies')
     return { providers: mockData.mockProxyProviders }
@@ -289,6 +300,23 @@ export function fetchBackendConfigAPI() {
   const request = useRequest()
 
   return request.get('configs').json<Config>()
+}
+
+export function fetchEditableConfigAPI() {
+  const request = useRequest()
+
+  return request.get('configs/editable').json<EditableConfig>()
+}
+
+export function updateEditableConfigAPI(config: EditableConfig) {
+  const request = useRequest()
+
+  return request
+    .put('configs/editable', {
+      searchParams: { force: true },
+      json: config,
+    })
+    .json<EditableConfigUpdateResult>()
 }
 
 export async function updateBackendConfigAPI(
