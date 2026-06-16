@@ -365,6 +365,8 @@ const providersTotalSize = computed(() =>
         </select>
       </div>
 
+      <RulesConfigEditor v-if="activeTab === 'rules'" />
+
       <!-- Rules List -->
       <template v-if="activeTab === 'rules'">
         <div ref="rulesParentRef" class="flex-1 overflow-y-auto">

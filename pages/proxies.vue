@@ -25,6 +25,7 @@ import ProxyNodeChip from '~/components/ProxyNodeChip.vue'
 import ProxyNodeListItem from '~/components/ProxyNodeListItem.vue'
 import ProxyNodePreview from '~/components/ProxyNodePreview.vue'
 import ProxyNodeTableRow from '~/components/ProxyNodeTableRow.vue'
+import ProxyProviderUrlEditor from '~/components/ProxyProviderUrlEditor.vue'
 import SubscriptionInfo from '~/components/SubscriptionInfo.vue'
 import { useBatchLatencyTest } from '~/composables/useBatchLatencyTest'
 import { PROXIES_DISPLAY_MODE } from '~/constants'
@@ -596,6 +597,9 @@ const ProxyProviderTitle = defineComponent({
         h(SubscriptionInfo, {
           subscriptionInfo: props.provider.subscriptionInfo,
         }),
+        h(ProxyProviderUrlEditor, {
+          providerName: props.provider.name,
+        }),
         h('div', { class: 'flex flex-col gap-2.5 pt-1' }, [
           h(
             'div',
@@ -830,6 +834,7 @@ const ProviderProxyNodes = defineComponent({
       class="min-h-0 flex-1 overflow-y-auto"
       :class="isMasterMode ? 'overflow-hidden' : ''"
     >
+      <ProxyGroupsConfigEditor />
       <ProxyMasterDetail
         v-if="isMasterMode"
         :groups="renderProxies"
