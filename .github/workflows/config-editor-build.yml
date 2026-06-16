@@ -34,7 +34,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Generate static UI
-        run: NUXT_APP_BASE_URL='./' pnpm generate
+        run: NUXT_APP_BASE_URL='./' NUXT_APP_BUILD_ASSETS_DIR='_nuxt/' pnpm generate
 
       - name: Publish gh-pages
         if: github.event_name == 'push'
