@@ -39,11 +39,14 @@ export interface EditableConfig {
 
 export interface EditableProxyGroup {
   name: string
+  type: string
+  proxies: string[]
   use: string[]
   filter: string
   url: string
   interval: number
   tolerance: number
+  strategy: string
 }
 
 export interface EditableConfigUpdateResult {

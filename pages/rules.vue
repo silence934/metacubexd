@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { Rule, RuleProvider } from '~/types'
 import {
+  IconEdit,
   IconFilter,
   IconFilterOff,
+  IconPlus,
   IconReload,
   IconSearch,
+  IconTrash,
   IconX,
 } from '@tabler/icons-vue'
 import { useVirtualizer } from '@tanstack/vue-virtual'
@@ -40,6 +43,11 @@ const toggleRuleDisabledMutation = useToggleRuleDisabledMutation()
 
 const activeTab = ref<'rules' | 'ruleProviders'>('rules')
 const globalFilter = ref('')
+const ruleConfigModal = ref<{
+  openForCreate: () => void
+  openForEdit: (rule: Rule) => void
+  openForDelete: (rule: Rule) => void
+}>()
 
 const { map: updatingMap, setWithCallback: setUpdatingMap } =
   useStringBooleanMap()
@@ -203,6 +211,33 @@ const rulesTotalSize = computed(() => rulesVirtualizer.value.getTotalSize())
 const providersTotalSize = computed(() =>
   providersVirtualizer.value.getTotalSize(),
 )
+
+function hasValidRuleTime(time?: string) {
+  if (!time) return false
+  return new Date(time).getTime() > 0
+}
+
+function hasRuleHit(rule: Rule) {
+  return (rule.extra?.hitCount ?? 0) > 0 && hasValidRuleTime(rule.extra?.hitAt)
+}
+
+function hasRuleMiss(rule: Rule) {
+  return (
+    (rule.extra?.missCount ?? 0) > 0 && hasValidRuleTime(rule.extra?.missAt)
+  )
+}
+
+function formatRuleHitTime(rule: Rule) {
+  return hasRuleHit(rule)
+    ? formatTimeFromNow(rule.extra!.hitAt!, locale.value)
+    : ''
+}
+
+function formatRuleMissTime(rule: Rule) {
+  return hasRuleMiss(rule)
+    ? formatTimeFromNow(rule.extra!.missAt!, locale.value)
+    : ''
+}
 </script>
 
 <template>
@@ -257,6 +292,18 @@ const providersTotalSize = computed(() =>
               :placeholder="t('search')"
             />
           </div>
+
+          <Button
+            v-if="activeTab === 'rules'"
+            class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+            :title="t('addRule')"
+            @click="ruleConfigModal?.openForCreate()"
+          >
+            <IconPlus :size="18" />
+            <span class="hidden text-sm font-medium sm:inline">
+              {{ t('addRule') }}
+            </span>
+          </Button>
 
           <Button
             v-if="activeTab === 'ruleProviders'"
@@ -365,8 +412,6 @@ const providersTotalSize = computed(() =>
         </select>
       </div>
 
-      <RulesConfigEditor v-if="activeTab === 'rules'" />
-
       <!-- Rules List -->
       <template v-if="activeTab === 'rules'">
         <div ref="rulesParentRef" class="flex-1 overflow-y-auto">
@@ -463,22 +508,20 @@ const providersTotalSize = computed(() =>
                           {{ item.data.extra?.missCount ?? 0 }}
                         </span>
                         <span
-                          v-if="item.data.extra?.hitAt"
+                          v-if="hasRuleHit(item.data)"
                           class="hidden shrink-0 text-[11px] text-base-content/50 md:inline"
-                          :title="`${t('lastMatchedAt')} ${formatTimeFromNow(item.data.extra.hitAt, locale)}`"
+                          :title="`${t('lastMatchedAt')} ${formatRuleHitTime(item.data)}`"
                         >
                           {{ t('lastMatchedAt') }}
-                          {{ formatTimeFromNow(item.data.extra.hitAt, locale) }}
+                          {{ formatRuleHitTime(item.data) }}
                         </span>
                         <span
-                          v-if="item.data.extra?.missAt"
+                          v-if="hasRuleMiss(item.data)"
                           class="hidden shrink-0 text-[11px] text-base-content/45 lg:inline"
-                          :title="`${t('lastUnmatchedAt')} ${formatTimeFromNow(item.data.extra.missAt, locale)}`"
+                          :title="`${t('lastUnmatchedAt')} ${formatRuleMissTime(item.data)}`"
                         >
                           {{ t('lastUnmatchedAt') }}
-                          {{
-                            formatTimeFromNow(item.data.extra.missAt, locale)
-                          }}
+                          {{ formatRuleMissTime(item.data) }}
                         </span>
                       </div>
                     </div>
@@ -488,6 +531,23 @@ const providersTotalSize = computed(() =>
                       class="hidden shrink-0 rounded-lg bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent sm:inline-flex"
                     >
                       {{ item.data.size }}
+                    </div>
+
+                    <div class="flex shrink-0 items-center gap-1">
+                      <Button
+                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-base-content/8 bg-base-content/5 text-base-content/60 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+                        :title="t('editRule')"
+                        @click="ruleConfigModal?.openForEdit(item.data)"
+                      >
+                        <IconEdit :size="15" />
+                      </Button>
+                      <Button
+                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-error/15 bg-error/5 text-error/75 transition-all duration-200 hover:border-error/35 hover:bg-error/12 hover:text-error"
+                        :title="t('deleteRule')"
+                        @click="ruleConfigModal?.openForDelete(item.data)"
+                      >
+                        <IconTrash :size="15" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -586,6 +646,8 @@ const providersTotalSize = computed(() =>
         </div>
       </div>
     </template>
+
+    <RuleConfigModal ref="ruleConfigModal" />
   </div>
 </template>
 

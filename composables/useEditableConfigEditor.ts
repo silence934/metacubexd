@@ -8,26 +8,26 @@ import {
 const DEFAULT_TEST_URL = 'http://www.gstatic.com/generate_204'
 
 export const editableRegionOptions = [
-  { code: 'HK', label: '香港', aliases: ['香港', 'Hong Kong', 'HK'] },
-  { code: 'TW', label: '台湾', aliases: ['台湾', 'Taiwan', 'TW'] },
-  { code: 'JP', label: '日本', aliases: ['日本', 'Japan', 'JP'] },
-  { code: 'SG', label: '新加坡', aliases: ['新加坡', 'Singapore', 'SG'] },
+  { code: 'HK', label: '香港', aliases: ['香港', 'Hong Kong', '🇭🇰'] },
+  { code: 'TW', label: '台湾', aliases: ['台湾', '臺灣', 'Taiwan', '🇹🇼'] },
+  { code: 'JP', label: '日本', aliases: ['日本', 'Japan', '🇯🇵'] },
+  { code: 'SG', label: '新加坡', aliases: ['新加坡', 'Singapore', '🇸🇬'] },
   {
     code: 'US',
     label: '美国',
-    aliases: ['美国', 'USA', 'United States', 'US'],
+    aliases: ['美国', '美國', 'United States', 'USA', '🇺🇸'],
   },
   {
     code: 'KR',
     label: '韩国',
-    aliases: ['韩国', 'Korea', 'South Korea', 'KR'],
+    aliases: ['韩国', '韓國', 'Korea', 'South Korea', '🇰🇷'],
   },
   {
     code: 'GB',
     label: '英国',
-    aliases: ['英国', 'United Kingdom', 'UK', 'GB'],
+    aliases: ['英国', '英國', 'United Kingdom', 'Britain', '🇬🇧'],
   },
-  { code: 'DE', label: '德国', aliases: ['德国', 'Germany', 'DE'] },
+  { code: 'DE', label: '德国', aliases: ['德国', '德國', 'Germany', '🇩🇪'] },
 ]
 
 function emptyConfig(): EditableConfig {
@@ -38,6 +38,38 @@ function emptyConfig(): EditableConfig {
   }
 }
 
+export function createEditableProxyGroup(
+  name: string,
+  providerNames: string[] = [],
+): EditableProxyGroup {
+  return {
+    name,
+    type: 'select',
+    proxies: [],
+    use: [...providerNames],
+    filter: '',
+    url: DEFAULT_TEST_URL,
+    interval: 300,
+    tolerance: 50,
+    strategy: 'consistent-hashing',
+  }
+}
+
+function normalizeProxyGroup(group: Partial<EditableProxyGroup>) {
+  return {
+    ...createEditableProxyGroup(group.name || ''),
+    ...group,
+    type: group.type || 'select',
+    proxies: [...(group.proxies ?? [])],
+    use: [...(group.use ?? [])],
+    filter: group.filter ?? '',
+    url: group.url || DEFAULT_TEST_URL,
+    interval: Number(group.interval) || 300,
+    tolerance: Number(group.tolerance) || 0,
+    strategy: group.strategy || 'consistent-hashing',
+  }
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -45,7 +77,9 @@ function escapeRegExp(value: string) {
 function normalizeConfig(config: EditableConfig): EditableConfig {
   return {
     'proxy-providers': { ...config['proxy-providers'] },
-    'proxy-groups': config['proxy-groups'].map((group) => ({ ...group })),
+    'proxy-groups': config['proxy-groups'].map((group) =>
+      normalizeProxyGroup(group),
+    ),
     rules: [...config.rules],
   }
 }
@@ -135,12 +169,11 @@ export function useEditableConfigEditor() {
     proxyGroups.value = [
       ...proxyGroups.value,
       {
+        ...createEditableProxyGroup(name, providerNames.value),
         name,
+        type: 'url-test',
         use: [...providerNames.value],
         filter: filterFromEditableRegions(['HK', 'TW', 'JP', 'SG', 'US']),
-        url: DEFAULT_TEST_URL,
-        interval: 300,
-        tolerance: 50,
       },
     ]
   }
@@ -155,6 +188,17 @@ export function useEditableConfigEditor() {
     proxyGroups.value = proxyGroups.value.filter(
       (_, itemIndex) => itemIndex !== index,
     )
+  }
+
+  function upsertProxyGroup(group: EditableProxyGroup, originalName = '') {
+    const name = originalName || group.name
+    const index = proxyGroups.value.findIndex((item) => item.name === name)
+    const normalized = normalizeProxyGroup(group)
+    if (index >= 0) {
+      updateProxyGroup(index, normalized)
+      return
+    }
+    proxyGroups.value = [...proxyGroups.value, normalized]
   }
 
   function addRule() {
@@ -186,11 +230,14 @@ export function useEditableConfigEditor() {
       'proxy-groups': proxyGroups.value.map((group) => ({
         ...group,
         name: group.name.trim(),
-        use: group.use.filter(Boolean),
+        type: group.type || 'select',
+        proxies: group.proxies.map((item) => item.trim()).filter(Boolean),
+        use: group.use.map((item) => item.trim()).filter(Boolean),
         filter: group.filter.trim(),
         url: group.url.trim(),
         interval: Number(group.interval) || 300,
         tolerance: Number(group.tolerance) || 0,
+        strategy: group.strategy.trim(),
       })),
       rules: rules.value.map((rule) => rule.trim()),
     }
@@ -202,7 +249,11 @@ export function useEditableConfigEditor() {
       error.value = t('editableConfigEmptyProxyGroup')
       return
     }
-    if (next['proxy-groups'].some((group) => group.use.length === 0)) {
+    if (
+      next['proxy-groups'].some(
+        (group) => group.use.length === 0 && group.proxies.length === 0,
+      )
+    ) {
       error.value = t('editableConfigProxyGroupNoProviders')
       return
     }
@@ -245,6 +296,7 @@ export function useEditableConfigEditor() {
     addProxyGroup,
     updateProxyGroup,
     removeProxyGroup,
+    upsertProxyGroup,
     addRule,
     updateRule,
     removeRule,

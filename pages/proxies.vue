@@ -9,8 +9,10 @@ import {
   IconChevronRight,
   IconChevronsDown,
   IconChevronsUp,
+  IconEdit,
   IconGlobe,
   IconPinnedOff,
+  IconPlus,
   IconReload,
   IconSearch,
   IconSettings,
@@ -52,6 +54,10 @@ const { isRunning: isBatchTesting, testMultipleGroups } = useBatchLatencyTest()
 
 const activeTab = ref<'proxies' | 'proxyProviders'>('proxies')
 const settingsModal = ref<{ open: () => void; close: () => void }>()
+const proxyGroupConfigModal = ref<{
+  openForCreate: () => void
+  openForEdit: (proxyGroup: ProxyType) => void
+}>()
 const proxyGroupsWrapper = ref<{ isTwoColumns: boolean }>()
 const providersWrapper = ref<{ isTwoColumns: boolean }>()
 
@@ -119,6 +125,10 @@ const toggleAllGroups = () => {
   for (const proxyGroup of renderProxies.value) {
     proxiesStore.collapsedMap[proxyGroup.name] = expand
   }
+}
+
+const openProxyGroupEditor = (proxyGroup: ProxyType) => {
+  proxyGroupConfigModal.value?.openForEdit(proxyGroup)
 }
 
 const tabs = computed(() => [
@@ -282,6 +292,21 @@ const ProxyGroupTitle = defineComponent({
               ],
             ),
             h('div', { class: 'flex items-center gap-1.5 shrink-0' }, [
+              h(
+                Button,
+                {
+                  class:
+                    'flex items-center justify-center w-9 h-9 rounded-lg bg-base-content/6 border border-base-content/8 text-base-content/60 transition-all duration-200 hover:bg-primary/15 hover:border-primary/30 hover:text-primary hover:-translate-y-px hover:shadow-lg hover:shadow-primary/15 active:translate-y-0',
+                  title: t('editProxyGroup'),
+                  onClick: (e: MouseEvent) => {
+                    e.stopPropagation()
+                    openProxyGroupEditor(props.proxyGroup)
+                  },
+                },
+                {
+                  default: () => h(IconEdit, { size: 18 }),
+                },
+              ),
               // Switch to Recommended button
               hasRecommendation.value &&
                 h(
@@ -761,6 +786,18 @@ const ProviderProxyNodes = defineComponent({
           </span>
         </Button>
 
+        <Button
+          v-if="activeTab === 'proxies'"
+          class="flex h-9 items-center gap-1.5 rounded-[0.625rem] border border-base-content/10 bg-base-200/80 px-3 transition-all duration-200 hover:border-primary/30 hover:bg-primary/15 hover:text-primary"
+          :title="t('addProxyGroup')"
+          @click="proxyGroupConfigModal?.openForCreate()"
+        >
+          <IconPlus :size="18" />
+          <span class="hidden text-sm font-medium sm:inline">
+            {{ t('addProxyGroup') }}
+          </span>
+        </Button>
+
         <!-- Batch Test Progress Indicator -->
         <div
           v-if="isBatchTesting"
@@ -834,7 +871,6 @@ const ProviderProxyNodes = defineComponent({
       class="min-h-0 flex-1 overflow-y-auto"
       :class="isMasterMode ? 'overflow-hidden' : ''"
     >
-      <ProxyGroupsConfigEditor />
       <ProxyMasterDetail
         v-if="isMasterMode"
         :groups="renderProxies"
@@ -999,6 +1035,8 @@ const ProviderProxyNodes = defineComponent({
         </template>
       </ProxiesRenderWrapper>
     </div>
+
+    <ProxyGroupConfigModal ref="proxyGroupConfigModal" />
 
     <!-- Settings Modal -->
     <Modal ref="settingsModal" :title="t('proxiesSettings')">
