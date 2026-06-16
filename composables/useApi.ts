@@ -33,7 +33,17 @@ interface MockProviderShape {
 
 export interface EditableConfig {
   'proxy-providers': Record<string, string>
+  'proxy-groups': EditableProxyGroup[]
   rules: string[]
+}
+
+export interface EditableProxyGroup {
+  name: string
+  use: string[]
+  filter: string
+  url: string
+  interval: number
+  tolerance: number
 }
 
 export interface EditableConfigUpdateResult {
@@ -121,7 +131,8 @@ function getMockData(url: string): unknown {
   // Map API endpoints to mock data
   if (path === 'version') return mockData.mockVersion
   if (path === 'configs') return mockData.mockConfig
-  if (path === 'configs/editable') return { 'proxy-providers': {}, rules: [] }
+  if (path === 'configs/editable')
+    return { 'proxy-providers': {}, 'proxy-groups': [], rules: [] }
   if (path === 'proxies') return { proxies: mockData.mockProxies }
   if (path === 'providers/proxies')
     return { providers: mockData.mockProxyProviders }
