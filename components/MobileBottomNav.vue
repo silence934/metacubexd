@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  IconActivityHeartbeat,
   IconChartAreaLine,
   IconFileStack,
   IconGlobe,
@@ -28,6 +29,7 @@ const rightPrimaryItems = computed(() => primaryItems.value.slice(2, 4))
 // Secondary items in the FAB popup
 const secondaryItems = computed(() => [
   { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
+  { href: '/netmon', name: t('networkMonitor'), icon: IconActivityHeartbeat },
   { href: '/logs', name: t('logs'), icon: IconFileStack },
   { href: '/config', name: t('config'), icon: IconSettings },
 ])
