@@ -46,6 +46,12 @@ corepack pnpm generate:mihomo
 
 本地Git仓库仍是唯一源码来源。修改完成后用 `rsync` 将源码同步到Ubuntu镜像，Nuxt会热更新，无需执行生产构建或改写 `/etc/mihomo/ui`。开发服务不替代9090上的生产页面，也不配置开机启动。
 
+项目内的同步命令：
+
+```bash
+./scripts/sync-dev-ubuntu.sh
+```
+
 安装：
 
 ```bash
