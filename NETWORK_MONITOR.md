@@ -25,10 +25,10 @@ MetaCubeXD 是静态前端，采集服务继续由 Ubuntu 上的 `netmon.py` 提
 corepack pnpm install --frozen-lockfile
 corepack pnpm typecheck
 corepack pnpm test:unit
-corepack pnpm generate
+corepack pnpm generate:mihomo
 ```
 
-生产文件输出到 `.output/public/`。
+生产文件输出到 `.output/public/`。Mihomo 从 `/ui/` 子目录提供页面，因此必须使用 `generate:mihomo` 生成相对资源路径；普通 `generate` 会让浏览器错误请求根目录 `/_nuxt/`。
 
 ## 当前部署位置
 
