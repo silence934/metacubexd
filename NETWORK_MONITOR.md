@@ -37,6 +37,15 @@ corepack pnpm generate:mihomo
 - Mihomo UI：`/etc/mihomo/ui`
 - 原 UI 备份：`/home/silence/.local/share/metacubexd-ui-backup-20260801`
 
+## Ubuntu临时开发模式
+
+- 开发源码镜像：`/home/silence/.local/src/metacubexd-netmon-dev`
+- 开发地址：`http://192.168.10.123:3000/`
+- 启动脚本：`/home/silence/.local/bin/run-metacubexd-dev`
+- 日志：`/home/silence/.local/share/metacubexd-dev/dev.log`
+
+本地Git仓库仍是唯一源码来源。修改完成后用 `rsync` 将源码同步到Ubuntu镜像，Nuxt会热更新，无需执行生产构建或改写 `/etc/mihomo/ui`。开发服务不替代9090上的生产页面，也不配置开机启动。
+
 安装：
 
 ```bash
