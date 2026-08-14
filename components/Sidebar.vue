@@ -2,6 +2,7 @@
 import type { Component } from 'vue'
 import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/vue'
 import {
+  IconActivityHeartbeat,
   IconBolt,
   IconChartAreaLine,
   IconChevronsLeft,
@@ -30,6 +31,7 @@ const navItems = computed(() => [
   { href: '/rules', name: t('rules'), icon: IconRuler },
   { href: '/connections', name: t('connections'), icon: IconNetwork },
   { href: '/traffic', name: t('dataUsage'), icon: IconChartAreaLine },
+  { href: '/netmon', name: t('networkMonitor'), icon: IconActivityHeartbeat },
   { href: '/logs', name: t('logs'), icon: IconFileStack },
   { href: '/config', name: t('config'), icon: IconSettings },
 ])
