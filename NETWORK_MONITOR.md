@@ -2,12 +2,13 @@
 
 ## 版本与分支
 
+- 开发仓库：`https://github.com/silence934/metacubexd.git`
 - 上游仓库：`https://github.com/MetaCubeX/metacubexd.git`
 - 当前上游基线：`v1.255.2`（`a2874b0`）
-- 本地维护分支：`codex/netmon-integration`
+- 开发构建分支：`feature/config-editor`
 - 自定义版本：`1.255.2-netmon.1`
 
-自定义代码只保留在独立分支中，不直接改动上游标签。服务器上的生产构建也保留独立备份，方便升级和回滚。
+配置编辑器和网络监控统一保留在用户 Fork 的开发构建分支中，不直接改动上游标签。该分支的 GitHub Actions 会生成静态 UI、发布 `gh-pages` 并上传构建产物。服务器上的生产构建也保留独立备份，方便升级和回滚。
 
 ## 集成结构
 
@@ -32,10 +33,10 @@ corepack pnpm generate:mihomo
 
 ## 当前部署位置
 
-- 待安装构建：`/home/silence/.local/share/metacubexd-netmon-1.255.2-netmon.1`
+- 待安装构建：`/home/silence/.local/share/metacubexd-feature-config-editor`
 - 安装脚本：`/home/silence/.local/bin/install-metacubexd-netmon`
 - Mihomo UI：`/etc/mihomo/ui`
-- 原 UI 备份：`/home/silence/.local/share/metacubexd-ui-backup-20260801`
+- UI 备份：`/home/silence/.local/share/metacubexd-ui-backup-<时间戳>`
 
 ## Ubuntu临时开发模式
 
@@ -58,10 +59,10 @@ corepack pnpm generate:mihomo
 sudo /home/silence/.local/bin/install-metacubexd-netmon
 ```
 
-回滚：
+安装脚本会先创建带时间戳的完整备份。回滚时选择对应备份目录：
 
 ```bash
-sudo rsync -a --delete /home/silence/.local/share/metacubexd-ui-backup-20260801/ /etc/mihomo/ui/
+sudo rsync -a --delete /home/silence/.local/share/metacubexd-ui-backup-<时间戳>/ /etc/mihomo/ui/
 sudo chown -R root:root /etc/mihomo/ui
 ```
 
@@ -70,8 +71,8 @@ sudo chown -R root:root /etc/mihomo/ui
 先获取上游标签，再把本分支的集成提交重放到新版本：
 
 ```bash
-git fetch origin --tags
-git checkout codex/netmon-integration
+git fetch upstream --tags
+git checkout feature/config-editor
 git rebase --onto v新版本 v1.255.2
 ```
 
